@@ -3,34 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>봉사보고 모바일 입력</title>
+  <title>봉사보고 모바일 관리 시스템</title>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { padding: 14px; margin: 0; background-color: #f8f9fa; color: #202124; }
-    #auth-screen { max-width: 400px; margin: 40px auto 0; padding: 24px 18px; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; border: 1px solid #e0e0e0; }
-    #auth-screen h3 { margin: 0 0 8px 0; color: #1a73e8; font-size: 18px; }
-    #auth-screen p { margin: 0 0 16px 0; font-size: 13px; color: #5f6368; line-height: 1.4; }
-    #main-form-content { max-width: 440px; margin: 0 auto; background: #ffffff; padding: 18px 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e8eaed; }
-    .form-header { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #1a73e8; }
-    .month-badge { display: inline-block; background: linear-gradient(135deg, #1a73e8, #1557b0); color: #ffffff; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 16px; margin-bottom: 6px; }
-    .form-header h2 { margin: 0 0 4px 0; font-size: 17px; color: #202124; }
-    .form-header p { margin: 0; font-size: 12px; color: #5f6368; }
-    .form-group { margin-bottom: 13px; }
-    label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: #3c4043; }
-    select, input[type="number"], input[type="text"], input[type="password"], textarea { width: 100%; padding: 10px 11px; border: 1px solid #dadce0; border-radius: 6px; font-size: 15px; background-color: #fff; }
-    select:focus, input:focus, textarea:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15); }
-    input:disabled, select:disabled { background-color: #f1f3f4; color: #70757a; cursor: not-allowed; }
-    .participate-card { background-color: #e8f0fe; border: 1px solid #c2e7ff; border-radius: 6px; padding: 10px 12px; margin-bottom: 13px; display: flex; align-items: flex-start; cursor: pointer; user-select: none; }
-    .participate-card input[type="checkbox"] { width: 18px; height: 18px; margin: 2px 10px 0 0; cursor: pointer; accent-color: #1a73e8; }
-    .participate-title { font-size: 13px; font-weight: 600; color: #1967d2; display: block; }
-    .participate-desc { font-size: 11px; color: #5f6368; margin-top: 2px; display: block; line-height: 1.3; }
-    textarea { resize: vertical; min-height: 55px; }
-    .btn-submit { width: 100%; padding: 12px; background-color: #1a73e8; color: #ffffff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; }
-    .btn-submit:hover { background-color: #1557b0; }
-    .btn-submit:disabled { background-color: #bdc1c6; cursor: not-allowed; }
-    .alert { padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-top: 12px; display: none; line-height: 1.4; word-break: break-all; }
-    .alert-success { background-color: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
-    .alert-danger { background-color: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { padding: 12px; margin: 0; background-color: #f1f3f4; color: #202124; }
+    
+    /* 인증 화면 */
+    #auth-screen { max-width: 380px; margin: 50px auto 0; padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+    #auth-screen h3 { margin: 0 0 10px; color: #1a73e8; }
+    #auth-screen p { font-size: 13px; color: #5f6368; margin-bottom: 16px; }
+    input[type="password"] { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #dadce0; border-radius: 8px; text-align: center; }
+
+    /* 메인 컨테이너 */
+    #main-container { max-width: 480px; margin: 0 auto; display: none; }
+
+    /* 상단 탭 내비게이션 */
+    .tab-nav { display: flex; background: #fff; border-radius: 10px; padding: 4px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .tab-btn { flex: 1; padding: 11px; text-align: center; border: none; background: transparent; font-size: 14px; font-weight: bold; color: #5f6368; border-radius: 8px; cursor: pointer; }
+    .tab-btn.active { background: #1a73e8; color: #fff; }
+
+    .card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 14px; }
+    h2 { font-size: 16px; margin: 0 0 12px; color: #1a73e8; }
+
+    /* 폼 요소 */
+    label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #3c4043; }
+    select, input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #dadce0; border-radius: 6px; margin-bottom: 10px; }
+    
+    .btn-submit { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+    .btn-submit:disabled { background: #bdc1c6; }
+
+    /* 조회 결과 리스트 */
+    .filter-box { display: flex; gap: 8px; margin-bottom: 12px; }
+    .filter-box select { margin-bottom: 0; }
+    .report-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
+    .report-item:last-child { border-bottom: none; }
+    .report-name { font-weight: bold; color: #202124; }
+    .report-group { font-size: 11px; color: #1a73e8; background: #e8f0fe; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+    .report-val { text-align: right; font-size: 13px; color: #3c4043; }
+    .badge-done { color: #188038; font-weight: bold; }
+    .badge-none { color: #d93025; font-size: 12px; }
+
+    .alert { padding: 10px; border-radius: 6px; font-size: 13px; margin-top: 10px; display: none; }
+    .alert-success { background: #e6f4ea; color: #137333; }
+    .alert-danger { background: #fce8e6; color: #c5221f; }
   </style>
 </head>
 <body>
@@ -38,23 +53,25 @@
   <!-- 🔒 보안 인증 화면 -->
   <div id="auth-screen">
     <h3>🔒 보안 인증</h3>
-    <p>봉사 보고 입력을 시작하려면<br>접속 비밀번호를 입력하세요.</p>
-    <input type="password" id="accessPassword" placeholder="비밀번호 입력" inputmode="numeric" autofocus>
-    <button type="button" class="btn-submit" onclick="checkPassword()" style="margin-top: 10px;">확인</button>
-    <div id="errorMsg" class="alert alert-danger" style="margin-top: 10px;">비밀번호가 일치하지 않습니다.</div>
+    <p>봉사보고 시스템에 접속하려면<br>비밀번호를 입력하세요.</p>
+    <input type="password" id="accessPassword" placeholder="비밀번호" inputmode="numeric" autofocus>
+    <button class="btn-submit" onclick="checkPassword()" style="margin-top:12px;">접속하기</button>
+    <div id="authError" class="alert alert-danger" style="margin-top:10px;">비밀번호가 일치하지 않습니다.</div>
   </div>
 
-  <!-- 📋 메인 보고 입력 폼 -->
-  <div id="main-form-content" style="display: none;">
-    <div class="form-header">
-      <div class="month-badge">📅 봉사보고 입력</div>
-      <h2>봉사보고 입력</h2>
-      <p>집단과 전도인을 선택하고 보고를 저장하세요.</p>
+  <!-- 📱 메인 인터페이스 -->
+  <div id="main-container">
+    <!-- 상단 탭 메뉴 -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('input')">📝 보고 입력</button>
+      <button class="tab-btn" onclick="switchTab('view')">📊 월별 내역 조회</button>
     </div>
 
-    <form id="reportForm" onsubmit="handleFormSubmit(event)">
-      <div class="form-group">
-        <label for="groupSelect">집단 선택 *</label>
+    <!-- 1. 보고 입력 화면 -->
+    <div id="tab-input" class="card">
+      <h2>봉사보고 제출</h2>
+      <form id="reportForm" onsubmit="handleFormSubmit(event)">
+        <label>집단 선택 *</label>
         <select id="groupSelect" required>
           <option value="">집단을 선택하세요</option>
           <option value="마태">마태</option>
@@ -64,87 +81,99 @@
           <option value="야고보">야고보</option>
           <option value="베드로">베드로</option>
         </select>
-      </div>
 
-      <div class="form-group">
-        <label for="nameInput">성명 *</label>
-        <input type="text" id="nameInput" placeholder="전도인 성명 입력" required>
-      </div>
+        <label>성명 *</label>
+        <input type="text" id="nameInput" placeholder="전도인 성명" required>
 
-      <label class="participate-card" id="participateCard">
-        <input type="checkbox" id="participatedCheck" onchange="toggleHoursInput()">
-        <div>
-          <span class="participate-title">봉사 참여함 (시간 미기록 전도인)</span>
-          <span class="participate-desc">체크 시 봉사시간 열에 '✔'로 기록됩니다.</span>
+        <div style="display:flex; align-items:center; margin-bottom:12px; background:#e8f0fe; padding:8px 10px; border-radius:6px;">
+          <input type="checkbox" id="participatedCheck" style="width:18px; height:18px; margin-right:8px;" onchange="toggleHours(this)">
+          <span style="font-size:13px; color:#1967d2; font-weight:600;">봉사 참여함 (시간 미기록 ✔)</span>
         </div>
-      </label>
 
-      <div class="form-group" id="hoursGroup">
-        <label for="hoursInput">봉사시간 (파이오니아 등)</label>
-        <input type="number" id="hoursInput" min="0" step="1" inputmode="numeric" placeholder="예: 15 (숫자만 입력)">
+        <label>봉사시간</label>
+        <input type="number" id="hoursInput" min="0" step="1" inputmode="numeric" placeholder="시간 (숫자)">
+
+        <label>성서 연구 건수</label>
+        <input type="number" id="studiesInput" min="0" step="1" inputmode="numeric" placeholder="연구 건수">
+
+        <label>비고</label>
+        <textarea id="remarksInput" placeholder="특이사항 (선택)" rows="2"></textarea>
+
+        <button type="submit" id="submitBtn" class="btn-submit">보고 저장</button>
+      </form>
+      <div id="submitAlert" class="alert"></div>
+    </div>
+
+    <!-- 2. 월별 내역 조회 화면 -->
+    <div id="tab-view" class="card" style="display: none;">
+      <h2>월별 보고 내역 확인</h2>
+      <div class="filter-box">
+        <select id="viewMonth" onchange="fetchMonthData()">
+          <option value="10월" selected>10월 봉사보고</option>
+          <option value="9월">9월 봉사보고</option>
+        </select>
+        <select id="viewGroup" onchange="renderRecords()">
+          <option value="ALL">전체 집단</option>
+          <option value="마태">마태</option>
+          <option value="마가">마가</option>
+          <option value="누가">누가</option>
+          <option value="요한">요한</option>
+          <option value="야고보">야고보</option>
+          <option value="베드로">베드로</option>
+        </select>
       </div>
 
-      <div class="form-group">
-        <label for="studiesInput">성서 연구 건수</label>
-        <input type="number" id="studiesInput" min="0" step="1" inputmode="numeric" placeholder="예: 2">
-      </div>
-
-      <div class="form-group">
-        <label for="remarksInput">비고</label>
-        <textarea id="remarksInput" placeholder="특이사항 입력 (선택)"></textarea>
-      </div>
-
-      <button type="submit" id="submitBtn" class="btn-submit">보고 저장</button>
-    </form>
-
-    <div id="alertBox" class="alert"></div>
+      <div id="queryStatus" style="font-size:12px; color:#5f6368; margin-bottom:8px;">조회 중...</div>
+      <div id="recordsList" style="border-top:1px solid #dadce0;"></div>
+    </div>
   </div>
 
   <script>
     const CORRECT_PASSWORD = "1935";
+    
+    // ★ 본인의 구글 웹 앱 URL을 아래 따옴표 안에 넣으세요
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzi2-pcGyXA1d61GP_hb7cEnSHAmL0Wi1Xe9IEVdFL2PxqvmqeiG_-O_lceqpqGEkxuuQ/exec";
 
-    // ★ [2단계]에서 복사한 Google Apps Script 웹 앱 URL을 아래 따옴표 안에 넣으세요
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzi2-pcGyXA1d61GP_hb7cEnSHAmL0Wi1Xe9IEVdFL2PxqvmqeiG_-O_lceqpqGEkxuuQ/exec";
+    let currentMonthData = [];
 
     function checkPassword() {
-      const inputVal = document.getElementById('accessPassword').value;
-      const errorDiv = document.getElementById('errorMsg');
-      if (inputVal === CORRECT_PASSWORD) {
+      if (document.getElementById('accessPassword').value === CORRECT_PASSWORD) {
         document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('main-form-content').style.display = 'block';
+        document.getElementById('main-container').style.display = 'block';
       } else {
-        errorDiv.style.display = 'block';
-        document.getElementById('accessPassword').value = '';
+        document.getElementById('authError').style.display = 'block';
       }
     }
 
-    document.getElementById('accessPassword').addEventListener('keyup', function(e) {
-      if (e.key === 'Enter') checkPassword();
-    });
+    function switchTab(tab) {
+      const isInput = tab === 'input';
+      document.getElementById('tab-input').style.display = isInput ? 'block' : 'none';
+      document.getElementById('tab-view').style.display = isInput ? 'none' : 'block';
+      
+      const btns = document.querySelectorAll('.tab-btn');
+      btns[0].classList.toggle('active', isInput);
+      btns[1].classList.toggle('active', !isInput);
 
-    function toggleHoursInput() {
-      const isChecked = document.getElementById('participatedCheck').checked;
-      const hoursInput = document.getElementById('hoursInput');
-      if (isChecked) {
-        hoursInput.value = '';
-        hoursInput.disabled = true;
-        hoursInput.placeholder = "봉사 참여(✔) 선택됨";
-      } else {
-        hoursInput.disabled = false;
-        hoursInput.placeholder = "예: 15 (숫자만 입력)";
+      if (!isInput && currentMonthData.length === 0) {
+        fetchMonthData();
       }
     }
 
+    function toggleHours(chk) {
+      const h = document.getElementById('hoursInput');
+      if (chk.checked) { h.value = ''; h.disabled = true; }
+      else { h.disabled = false; }
+    }
+
+    // 보고 저장 전송
     async function handleFormSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
-      const alertBox = document.getElementById('alertBox');
+      const alertBox = document.getElementById('submitAlert');
       alertBox.style.display = 'none';
+      btn.disabled = true; btn.innerText = "저장 중...";
 
-      btn.disabled = true;
-      btn.innerText = "저장 중...";
-
-      const formData = {
+      const payload = {
         group: document.getElementById('groupSelect').value,
         name: document.getElementById('nameInput').value.trim(),
         participated: document.getElementById('participatedCheck').checked,
@@ -154,31 +183,83 @@
       };
 
       try {
-        await fetch(GOOGLE_SCRIPT_URL, {
+        await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
-
         alertBox.className = "alert alert-success";
-        alertBox.innerText = `[${formData.group}] ${formData.name} 님의 보고가 안전하게 전송되었습니다!`;
+        alertBox.innerText = `[${payload.group}] ${payload.name} 님의 보고가 저장되었습니다.`;
         alertBox.style.display = "block";
-
         document.getElementById('nameInput').value = '';
         document.getElementById('hoursInput').value = '';
         document.getElementById('studiesInput').value = '';
         document.getElementById('remarksInput').value = '';
-        document.getElementById('participatedCheck').checked = false;
-        toggleHoursInput();
+        currentMonthData = []; // 조회 데이터 초기화(새로고침 유도)
       } catch (err) {
         alertBox.className = "alert alert-danger";
-        alertBox.innerText = "전송 실패: " + err.message;
+        alertBox.innerText = "저장 실패: " + err.message;
         alertBox.style.display = "block";
       } finally {
-        btn.disabled = false;
-        btn.innerText = "보고 저장";
+        btn.disabled = false; btn.innerText = "보고 저장";
       }
+    }
+
+    // 월별 데이터 조회
+    async function fetchMonthData() {
+      const month = document.getElementById('viewMonth').value;
+      const status = document.getElementById('queryStatus');
+      status.innerText = `[${month}] 데이터를 불러오는 중...`;
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getMonthData&month=${encodeURIComponent(month)}`);
+        const json = await res.json();
+        if (json.success) {
+          currentMonthData = json.data;
+          status.innerText = `총 ${json.total}명 명단 조회 완료`;
+          renderRecords();
+        } else {
+          status.innerText = json.message;
+        }
+      } catch (e) {
+        status.innerText = "데이터 조회 오류: " + e.message;
+      }
+    }
+
+    // 필터링 및 리스트 렌더링
+    function renderRecords() {
+      const selectedGrp = document.getElementById('viewGroup').value;
+      const listDiv = document.getElementById('recordsList');
+      listDiv.innerHTML = '';
+
+      const filtered = selectedGrp === 'ALL' 
+        ? currentMonthData 
+        : currentMonthData.filter(r => r.group === selectedGrp);
+
+      if (filtered.length === 0) {
+        listDiv.innerHTML = '<div style="padding:16px; text-align:center; color:#70757a;">기록된 명단이 없습니다.</div>';
+        return;
+      }
+
+      filtered.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'report-item';
+        const hasReport = (r.hours !== '-' && r.hours !== '') || (r.studies !== '-' && r.studies !== '');
+        
+        item.innerHTML = `
+          <div>
+            <span class="report-name">${r.name}</span>
+            <span class="report-group">${r.group}</span>
+          </div>
+          <div class="report-val">
+            ${hasReport 
+              ? `<span class="badge-done">시간: ${r.hours} | 연구: ${r.studies}</span>` 
+              : `<span class="badge-none">미보고</span>`}
+          </div>
+        `;
+        listDiv.appendChild(item);
+      });
     }
   </script>
 </body>

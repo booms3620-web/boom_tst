@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>봉사보고 모바일 관리</title>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { padding: 12px; margin: 0; background-color: #f1f3f4; color: #202124; }
     
     /* 🔒 보안 인증 화면 */
@@ -39,17 +39,29 @@
     .btn-submit { width: 100%; padding: 13px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
     .btn-submit:disabled { background: #bdc1c6; }
 
+    /* 조회 목록 항목 스타일 */
     .filter-box { display: flex; gap: 8px; margin-bottom: 12px; }
     .filter-box select { margin-bottom: 0; }
-    .report-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 12px; border-bottom: 1px solid #f1f3f4; font-size: 14px; }
-    .report-name { font-weight: bold; color: #202124; }
+    .report-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f1f3f4; font-size: 14px; background: #fff; border-radius: 8px; margin-bottom: 6px; border: 1px solid #f1f3f4; }
+    .report-name { font-weight: bold; color: #202124; font-size: 15px; }
     .report-group { font-size: 11px; color: #1a73e8; background: #e8f0fe; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
-    .badge-done { color: #188038; font-weight: bold; font-size: 13px; }
-    .badge-none { color: #d93025; font-size: 12px; }
+    .badge-done { color: #188038; font-weight: bold; font-size: 13px; display: block; }
+    .badge-none { color: #d93025; font-size: 12px; display: block; }
+
+    /* ✏️ 모바일 전용 수정 버튼 */
+    .btn-edit-trigger { background-color: #e8f0fe; color: #1a73e8; border: 1px solid #c2e7ff; padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; margin-left: 10px; white-space: nowrap; }
+    .btn-edit-trigger:active { background-color: #1a73e8; color: #fff; }
 
     .alert { padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-top: 10px; display: none; }
-    .alert-success { background: #e6f4ea; color: #137333; }
-    .alert-danger { background: #fce8e6; color: #c5221f; }
+    .alert-success { background-color: #e6f4ea; color: #137333; }
+    .alert-danger { background-color: #fce8e6; color: #c5221f; }
+
+    /* 팝업 수정 모달 (지난 달 안전 수정 전용) */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
+    .modal-content { background: #fff; width: 92%; max-width: 400px; border-radius: 12px; padding: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .modal-header { font-size: 16px; font-weight: bold; color: #1a73e8; margin-bottom: 14px; border-bottom: 1px solid #dadce0; padding-bottom: 8px; }
+    .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+    .btn-cancel { flex: 1; padding: 12px; background: #f1f3f4; color: #3c4043; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -67,10 +79,10 @@
   <div id="main-container">
     <div class="tab-nav">
       <button class="tab-btn active" onclick="switchTab('input')">📝 보고 입력</button>
-      <button class="tab-btn" onclick="switchTab('view')">📊 10월/월별 보고 조회</button>
+      <button class="tab-btn" onclick="switchTab('view')">📊 월별 보고 조회 및 수정</button>
     </div>
 
-    <!-- 1. 보고 입력 화면 -->
+    <!-- 1. 이번 달 보고 입력 화면 -->
     <div id="tab-input" class="card">
       <div class="form-header">
         <div class="month-badge" id="monthBadge">📅 불러오는 중...</div>
@@ -130,11 +142,11 @@
       <div id="submitAlert" class="alert"></div>
     </div>
 
-    <!-- 2. 월별 보고 내역 확인 화면 -->
+    <!-- 2. 월별 보고 내역 확인 및 안전 수정 화면 -->
     <div id="tab-view" class="card" style="display: none;">
       <div class="form-header">
         <h2>월별 봉사보고 집계 현황</h2>
-        <p>실제 스프레드시트의 보고 내역을 실시간으로 확인합니다.</p>
+        <p>명단 우측의 <b>[수정] 버튼</b>을 누르면 지난 달 보고를 안전하게 바로잡을 수 있습니다.</p>
       </div>
 
       <div class="filter-box">
@@ -154,7 +166,47 @@
       </div>
 
       <div id="queryStatus" style="font-size:12px; color:#5f6368; margin-bottom:8px; font-weight:600;">데이터 조회 준비 중...</div>
-      <div id="recordsList" style="border-top:1px solid #dadce0;"></div>
+      <div id="recordsList" style="border-top:1px solid #dadce0; padding-top:6px;"></div>
+    </div>
+  </div>
+
+  <!-- ✏️ 지난 달 개인 보고 원포인트 안전 수정 팝업 모달 -->
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle">보고 수정</div>
+      
+      <div class="form-group">
+        <label>소속 및 성명</label>
+        <input type="text" id="modalTargetName" disabled style="background:#f1f3f4; font-weight:bold;">
+      </div>
+
+      <label class="participate-card" style="margin-top: 10px;">
+        <input type="checkbox" id="modalParticipated" onchange="toggleModalHours(this)">
+        <div>
+          <span class="participate-title">봉사 참여함 (✔)</span>
+          <span class="participate-desc">체크 시 봉사시간이 '✔'로 기록됩니다.</span>
+        </div>
+      </label>
+
+      <div class="form-group">
+        <label>봉사시간</label>
+        <input type="number" id="modalHours" min="0" step="1" inputmode="numeric" placeholder="시간 (숫자)">
+      </div>
+
+      <div class="form-group">
+        <label>성서 연구 건수</label>
+        <input type="number" id="modalStudies" min="0" step="1" inputmode="numeric" placeholder="연구 건수">
+      </div>
+
+      <div class="form-group">
+        <label>비고</label>
+        <textarea id="modalRemarks" rows="2" placeholder="특이사항"></textarea>
+      </div>
+
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" onclick="closeEditModal()">취소</button>
+        <button type="button" class="btn-submit" id="modalSaveBtn" style="flex:1; margin-top:0;" onclick="saveModalEdit()">수정 저장</button>
+      </div>
     </div>
   </div>
 
@@ -163,8 +215,8 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWryxCbFws7I3q0-oUESdxJdxN3KRGyDCkbFQAz1XdT7oO2uytg5cLy2dpn5E4Re1z/exec";
 
     let currentMonthData = [];
+    let selectedEditRecord = null;
 
-    // JSONP 호출 헬퍼 함수 (모바일 브라우저 CORS 차단 완전 해결)
     function callJsonp(params, callback) {
       const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
       window[callbackName] = function(data) {
@@ -178,7 +230,7 @@
       script.onerror = function() {
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
-        alert('데이터 통신 오류가 발생했습니다. 네트워크 및 배포 권한을 확인해주세요.');
+        alert('데이터 통신 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
       };
       document.body.appendChild(script);
     }
@@ -187,7 +239,7 @@
       if (document.getElementById('accessPassword').value === CORRECT_PASSWORD) {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-container').style.display = 'block';
-        fetchTargetMonth(); // 인증 완료 즉시 시트의 대상 월 불러오기
+        fetchTargetMonth();
       } else {
         document.getElementById('authError').style.display = 'block';
       }
@@ -197,7 +249,6 @@
       if (e.key === 'Enter') checkPassword();
     });
 
-    // 1. 시트의 대상 월 텍스트 가져오기
     function fetchTargetMonth() {
       callJsonp({ action: 'getTargetMonth' }, function(res) {
         if (res && res.success && res.month) {
@@ -209,7 +260,6 @@
       });
     }
 
-    // 2. 집단 선택 시 실시간 명단 가져오기
     function loadMembers() {
       const group = document.getElementById('groupSelect').value;
       const nameSelect = document.getElementById('nameSelect');
@@ -281,7 +331,6 @@
       }
     }
 
-    // 3. 월별 데이터 실시간 조회
     function fetchMonthData() {
       const month = document.getElementById('viewMonth').value;
       const status = document.getElementById('queryStatus');
@@ -290,7 +339,7 @@
       callJsonp({ action: 'getMonthData', month: month }, function(res) {
         if (res && res.success) {
           currentMonthData = res.data;
-          status.innerText = `총 ${res.total}명 명단 조회 완료 (동기화 완료)`;
+          status.innerText = `총 ${res.total}명 ([수정] 버튼을 눌러 바로 수정 가능)`;
           renderRecords();
         } else {
           status.innerText = res.message || '데이터를 가져오지 못했습니다.';
@@ -312,7 +361,7 @@
         return;
       }
 
-      filtered.forEach(r => {
+      filtered.forEach((r, idx) => {
         const item = document.createElement('div');
         item.className = 'report-item';
         const hasReport = (r.hours !== '-' && r.hours !== '') || (r.studies !== '-' && r.studies !== '');
@@ -321,18 +370,109 @@
           <div>
             <span class="report-name">${r.name}</span>
             <span class="report-group">${r.group}</span>
+            <div style="margin-top:4px;">
+              ${hasReport 
+                ? `<span class="badge-done">${r.hours === '✔' ? '참여(✔)' : '시간: ' + r.hours + 'h'} | 연구: ${r.studies}</span>` 
+                : `<span class="badge-none">미보고</span>`}
+            </div>
           </div>
-          <div style="text-align:right;">
-            ${hasReport 
-              ? `<span class="badge-done">${r.hours === '✔' ? '참여(✔)' : '시간: ' + r.hours + 'h'} | 연구: ${r.studies}</span>` 
-              : `<span class="badge-none">미보고</span>`}
+          <div>
+            <button type="button" class="btn-edit-trigger" id="editBtn_${idx}">✏️ 수정</button>
           </div>
         `;
+
+        // 팝업 열기 바인딩 (PC 클릭 및 모바일 터치 완벽 지원)
+        const editBtn = item.querySelector('.btn-edit-trigger');
+        const triggerOpen = function(e) {
+          if (e) e.stopPropagation();
+          openEditModal(r);
+        };
+        editBtn.onclick = triggerOpen;
+        item.onclick = triggerOpen;
+
         listDiv.appendChild(item);
       });
     }
 
-    // 4. 보고 저장
+    /* 팝업 수정 모달 함수 */
+    function openEditModal(record) {
+      selectedEditRecord = record;
+      const month = document.getElementById('viewMonth').value;
+      document.getElementById('modalTitle').innerText = `[${month}] 보고 안전 수정`;
+      document.getElementById('modalTargetName').value = `[${record.group}] ${record.name}`;
+
+      const isPart = record.hours === '✔';
+      document.getElementById('modalParticipated').checked = isPart;
+      
+      const hoursField = document.getElementById('modalHours');
+      hoursField.value = (!isPart && record.hours !== '-') ? record.hours : '';
+      hoursField.disabled = isPart;
+
+      document.getElementById('modalStudies').value = (record.studies !== '-') ? record.studies : '';
+      document.getElementById('modalRemarks').value = record.remarks || '';
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function toggleModalHours(chk) {
+      const hInput = document.getElementById('modalHours');
+      if (chk.checked) {
+        hInput.value = '';
+        hInput.disabled = true;
+      } else {
+        hInput.disabled = false;
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+      selectedEditRecord = null;
+    }
+
+    /* 지난 달 개인 보고 수정 저장 (원포인트 API 전송) */
+    async function saveModalEdit() {
+      if (!selectedEditRecord) return;
+      const btn = document.getElementById('modalSaveBtn');
+      btn.disabled = true;
+      btn.innerText = "저장 중...";
+
+      const targetMonth = document.getElementById('viewMonth').value;
+      const isPart = document.getElementById('modalParticipated').checked;
+      const hoursVal = document.getElementById('modalHours').value;
+      const studiesVal = document.getElementById('modalStudies').value;
+      const remarksVal = document.getElementById('modalRemarks').value;
+
+      const payload = {
+        action: 'updatePastMonth',
+        month: targetMonth,
+        group: selectedEditRecord.group,
+        name: selectedEditRecord.name,
+        participated: isPart,
+        hours: hoursVal,
+        studies: studiesVal,
+        remarks: remarksVal
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        alert(`[${targetMonth}] ${selectedEditRecord.group} ${selectedEditRecord.name} 님의 보고가 안전하게 수정되었습니다!`);
+        closeEditModal();
+        fetchMonthData(); // 목록 새로고침
+      } catch (err) {
+        alert("수정 실패: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "수정 저장";
+      }
+    }
+
+    /* 이번 달 신규 보고 저장 */
     async function handleFormSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
@@ -341,6 +481,7 @@
       btn.disabled = true; btn.innerText = "저장 중...";
 
       const payload = {
+        action: 'saveCurrentMonth',
         group: document.getElementById('groupSelect').value,
         name: document.getElementById('nameSelect').value,
         participated: document.getElementById('participatedCheck').checked,
